@@ -1,11 +1,11 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+﻿const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 /**
  * 三位專家的分析 Prompts
  */
 const EXPERT_PROMPTS = {
     seo: {
-        name: 'SEO 專家',
+        name: 'SEO 技術專家',
         icon: '🕷️',
         prompt:
             `# [SYSTEM_START]
@@ -145,11 +145,11 @@ const EXPERT_PROMPTS = {
 
 ---
 頁面資料：
-\`
+`
     },
 
     ux: {
-        name: 'UI/UX 專家',
+        name: 'UX 設計專家',
         icon: '🎨',
         prompt: `# [SYSTEM_START]
 
@@ -289,11 +289,11 @@ const EXPERT_PROMPTS = {
 
 ---
     頁面資料：
-    \`
+    `
     },
 
     growth: {
-        name: '成長駭客',
+        name: '成長優化專家',
         icon: '📈',
         prompt: `#[SYSTEM_START]
 
@@ -554,7 +554,7 @@ window.dataLayer.push({
  */
 const SITE_EXPERT_PROMPTS = {
     seo: {
-        name: '企業級 SEO 戰略總監',
+        name: 'SEO 戰略總監',
         icon: '🔍',
         prompt: `你是「企業級 SEO 戰略總監(Enterprise SEO Director)」兼「資訊架構師(Information Architect)」。
 { { GROUNDING_INSTRUCTION } }
@@ -701,7 +701,7 @@ const SITE_EXPERT_PROMPTS = {
     },
 
     ux: {
-        name: '首席體驗架構師',
+        name: 'UX 架構總監',
         icon: '🎨',
         prompt: `你是一位頂尖「首席體驗架構師(Chief Experience Architect, CXA)」。
 { { GROUNDING_INSTRUCTION } }
@@ -847,7 +847,7 @@ const SITE_EXPERT_PROMPTS = {
     },
 
     growth: {
-        name: '首席成長架構師',
+        name: '成長戰略總監',
         icon: '📈',
         prompt: `你是一位頂尖「首席成長架構師」。
 { { GROUNDING_INSTRUCTION } }
@@ -993,7 +993,7 @@ const SITE_EXPERT_PROMPTS = {
     },
 
     ga4: {
-        name: 'GA4 數據治理架構師',
+        name: 'GA4 數據總監',
         icon: '📊',
         prompt: `你是「GA4 數據治理架構師(GA4 Data Governance Architect)」。
 { { GROUNDING_INSTRUCTION } }
@@ -1128,7 +1128,7 @@ window.dataLayer.push({
 async function analyzeWithExpert(expertType, pageDetail, apiKey, screenshot = null, domTree = null, jsArchitecture = null, ga4TrackingData = null, useGrounding = false, groundingContext = '') {
     const expert = EXPERT_PROMPTS[expertType];
     if (!expert) {
-        throw new Error(`找不到專家類型: ${ expertType } `);
+        throw new Error(`找不到專家類型: ${expertType} `);
     }
 
     const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -1206,7 +1206,7 @@ async function analyzeWithExpert(expertType, pageDetail, apiKey, screenshot = nu
 
         // 注入使用者自訂搜尋上下文
         if (groundingContext) {
-            groundingInstruction += `\n\n **🎯 USER OVERRIDE(使用者指定焦點) **\n    請優先針對以下指示進行搜尋與情報收集：\n    「${ groundingContext }」`;
+            groundingInstruction += `\n\n **🎯 USER OVERRIDE(使用者指定焦點) **\n    請優先針對以下指示進行搜尋與情報收集：\n    「${groundingContext}」`;
         }
     } else {
         // 離線模式
@@ -1316,8 +1316,8 @@ async function analyzeWithExpert(expertType, pageDetail, apiKey, screenshot = nu
             groundingMetadata // 新增引用資料
         };
     } catch (error) {
-        console.error(`[AI 分析錯誤] ${ expertType }: `, error.message);
-        throw new Error(`AI 分析失敗: ${ error.message } `);
+        console.error(`[AI 分析錯誤] ${expertType}: `, error.message);
+        throw new Error(`AI 分析失敗: ${error.message} `);
     }
 }
 

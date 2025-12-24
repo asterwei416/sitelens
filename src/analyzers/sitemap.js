@@ -25,7 +25,18 @@ async function analyzeSitemap(crawlResult, baseUrl) {
         .slice(0, 20) // 限制數量
         .map(link => {
             const parsed = new URL(link.url);
-            const pageTitle = urlToTitle.get(link.url) || link.text || parsed.pathname;
+            // 優先使用爬取的真實 title，其次使用 URL 路徑（更能區分頁面），
+            // 只有在路徑為 "/" 時才使用連結文字
+            const crawledTitle = urlToTitle.get(link.url);
+            let pageTitle;
+            if (crawledTitle) {
+                pageTitle = crawledTitle;
+            } else if (parsed.pathname && parsed.pathname !== '/') {
+                // 使用 URL 路徑作為顯示名稱（去除開頭斜線，更易讀）
+                pageTitle = decodeURIComponent(parsed.pathname.replace(/^\//, '') || link.text || 'Page');
+            } else {
+                pageTitle = link.text || parsed.hostname;
+            }
             return {
                 title: pageTitle,
                 url: link.url,

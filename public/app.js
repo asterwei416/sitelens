@@ -246,6 +246,7 @@ function initSitemapTree(data) {
     expanded: true,
     analyzed: true,
     pageDetail: data.level0PageDetail,
+    screenshot: data.level0Screenshot,   // 儲存 L0 截圖
     domTree: data.domTree,           // 儲存 DOM tree
     jsArchitecture: data.jsArchitecture, // 儲存 JS architecture
     children: (tree.children || []).map((child, i) => ({
