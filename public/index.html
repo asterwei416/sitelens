@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiteLens AI (網站之眼)</title>
+  <meta name="description" content="分析網頁的 Sitemap、SEO Tags、連結動線與語意區塊">
+  <link rel="stylesheet" href="styles.css?v=20251221">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">🔍</span>
+        <h1>SiteLens AI (網站之眼)</h1>
+      </div>
+      <p class="tagline">用 AI 的眼看穿網站，將數據鍛造成洞察報告</p>
+    </header>
+
+    <!-- Input Section -->
+    <section class="input-section">
+      <form id="analyzeForm" class="url-form">
+        <div class="form-container">
+          <!-- Row 1: URL Input -->
+          <div class="form-row">
+            <div class="input-wrapper url-input-wrapper" style="width: 100%;">
+              <span class="input-icon">🌐</span>
+              <input type="url" id="urlInput" placeholder="輸入目標 URL (例: https://example.com)" required>
+            </div>
+          </div>
+
+          <!-- Row 2: API Key + Submit -->
+          <div class="form-row">
+            <div class="input-wrapper api-key-wrapper">
+              <span class="input-icon">🔑</span>
+              <input type="password" id="geminiApiKey" placeholder="Gemini API Key" />
+              <button id="toggleKeyVisibility" type="button" title="顯示/隱藏">👁️</button>
+              <button id="clearApiKey" type="button" title="清除內容" style="display: none;">❌</button>
+            </div>
+            <button type="submit" id="submitBtn">
+              <span class="btn-text">開始分析</span>
+              <span class="btn-loading" hidden>
+                <span class="spinner"></span> 分析中...
+              </span>
+            </button>
+          </div>
+        </div>
+        <p class="api-hint">💡 提供 API Key 可啟用 AI 網站概覽分析（架構解讀 + 商業目標判斷）</p>
+
+        <!-- Global Grounding Toggle -->
+        <div class="grounding-row">
+          <label class="toggle-switch-container">
+            <input type="checkbox" id="globalGroundingToggle">
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">🔍 啟用 Google 連網分析 (Grounding)</span>
+          </label>
+        </div>
+
+        <!-- Advanced Settings (Collapsible) -->
+        <details class="advanced-settings">
+          <summary>🍪 進階設定 (登入 Cookie)</summary>
+          <div class="advanced-content">
+            <p class="cookie-hint">
+              若需爬取會員專區，請從瀏覽器複製已登入的 Cookie (JSON 格式)。<br>
+              💡 推薦使用 <a
+                href="https://chromewebstore.google.com/detail/editthiscookie-v3/ojfebgpkimhlhcblbalbfjblapadhbol?hl=zh-TW"
+                target="_blank">EditThisCookie</a> 擴充功能一鍵匯出！
+            </p>
+            <textarea id="sessionCookies" class="cookie-input" rows="4"
+              placeholder='[{"name": "session_id", "value": "abc123", "domain": ".example.com", "path": "/"}]'></textarea>
+          </div>
+        </details>
+      </form>
+      <div id="statusMessage" class="status-message"></div>
+    </section>
+
+    <!-- Site Overview Section (首次分析後顯示) -->
+    <section id="siteOverviewSection" class="site-overview-section" hidden>
+      <div class="overview-header">
+        <h2>🎯 網站概覽分析</h2>
+        <span class="ai-badge">由 AI 自動分析</span>
+      </div>
+      <div id="siteOverviewContent" class="overview-content">
+        <div class="loading">
+          <span class="spinner"></span>
+          <span>AI 正在解讀網站架構與商業目標...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="resultsSection" class="results-section" hidden>
+      <!-- Main Layout: Sitemap + Detail Panel -->
+      <div class="main-layout">
+
+        <!-- Left: Sitemap Tree -->
+        <div class="sitemap-panel">
+          <div class="panel-header">
+            <h2>🗺️ Sitemap 結構</h2>
+            <div id="sitemapStats" class="stats"></div>
+          </div>
+          <div class="sitemap-controls">
+            <p class="hint">💡 點擊節點查看頁面詳細分析 | 滾輪縮放，拖曳平移</p>
+            <div class="zoom-controls">
+              <button id="zoomOut" title="縮小">➖</button>
+              <span id="zoomLevel">100%</span>
+              <button id="zoomIn" title="放大">➕</button>
+              <button id="zoomReset" title="重設">↻</button>
+            </div>
+          </div>
+          <div id="sitemapViz" class="tree-container"></div>
+        </div>
+
+        <!-- Right: Page Detail Panel with Tabs -->
+        <div id="detailPanel" class="detail-panel">
+          <div class="panel-header">
+            <h2>📄 頁面分析</h2>
+            <span id="detailPageUrl" class="detail-url"></span>
+          </div>
+
+          <!-- Page Species AI Analysis -->
+          <div id="pageSpeciesSection" class="page-species-section" style="display: none;">
+            <!-- Content will be injected by JS -->
+          </div>
+
+          <!-- Screenshot Preview -->
+          <div id="screenshotPreview" class="screenshot-preview" style="display: none;">
+            <h3>📸 頁面快照</h3>
+            <img id="screenshotImg" src="" alt="頁面截圖" />
+          </div>
+
+          <!-- Detail Tabs -->
+          <div class="detail-tabs">
+            <button class="detail-tab" data-detail-tab="info">
+              <span class="tab-icon">📋</span> 基本資訊
+            </button>
+            <button class="detail-tab active" data-detail-tab="seo">
+              <span class="tab-icon">🔍</span> SEO 專家
+            </button>
+            <button class="detail-tab" data-detail-tab="ux">
+              <span class="tab-icon">🎨</span> UI/UX 專家
+            </button>
+            <button class="detail-tab" data-detail-tab="growth">
+              <span class="tab-icon">📈</span> 成長駭客
+            </button>
+            <button class="detail-tab" data-detail-tab="ga4">
+              <span class="tab-icon">📊</span> GA4 追蹤專家
+            </button>
+          </div>
+        </div> <!-- 關閉 detail-panel -->
+      </div> <!-- 關閉 main-layout -->
+
+      <!-- Tab Contents (獨立區塊，在 main-layout 下方) -->
+      <div class="detail-tab-contents">
+        <!-- 基本資訊 Tab -->
+        <div id="detailTabInfo" class="detail-tab-content">
+          <div id="detailContent" class="detail-content">
+            <div class="empty-state">
+              <span class="empty-icon">👆</span>
+              <p>請點擊左側 Sitemap 中的頁面節點</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEO 專家 Tab -->
+        <div id="detailTabSeo" class="detail-tab-content active">
+          <div class="ai-expert-panel">
+            <div class="expert-header">
+              <span class="expert-badge">🔍 SEO 工程專家</span>
+              <div class="expert-controls">
+                <div class="expert-context-input-wrapper" style="display: none;">
+                  <input type="text" class="expert-context-input" placeholder="🎯 自訂搜尋焦點 (選填)">
+                </div>
+                <button class="run-expert-btn" data-type="seo">▶️ 執行分析</button>
+              </div>
+            </div>
+            <div id="seoExpertResult" class="expert-result">
+              <p class="expert-hint">點擊「執行分析」開始 AI 專家深度分析</p>
+            </div>
+            <div class="followup-section" data-expert="seo" style="display: none;">
+              <div class="followup-input-wrapper">
+                <textarea class="followup-input" rows="3" placeholder="追問更多細節，例如：請詳細說明第2點..."></textarea>
+                <div class="followup-upload-row">
+                  <label class="upload-label">
+                    📎 附加檔案
+                    <input type="file" class="followup-file" accept="image/*,.pdf" multiple>
+                  </label>
+                  <span class="upload-preview"></span>
+                </div>
+                <button class="followup-btn">發送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- UI/UX 專家 Tab -->
+        <div id="detailTabUx" class="detail-tab-content">
+          <div class="ai-expert-panel">
+            <div class="expert-header">
+              <span class="expert-badge">🎨 UI/UX 設計專家</span>
+              <div class="expert-controls">
+                <div class="expert-context-input-wrapper" style="display: none;">
+                  <input type="text" class="expert-context-input" placeholder="🎯 自訂搜尋焦點 (選填)">
+                </div>
+                <button class="run-expert-btn" data-type="ux">▶️ 執行分析</button>
+              </div>
+            </div>
+            <div id="uxExpertResult" class="expert-result">
+              <p class="expert-hint">點擊「執行分析」開始 AI 專家深度分析</p>
+            </div>
+            <div class="followup-section" data-expert="ux" style="display: none;">
+              <div class="followup-input-wrapper">
+                <textarea class="followup-input" rows="3" placeholder="追問更多細節，例如：如何改善導覽結構？"></textarea>
+                <div class="followup-upload-row">
+                  <label class="upload-label">
+                    📎 附加檔案
+                    <input type="file" class="followup-file" accept="image/*,.pdf" multiple>
+                  </label>
+                  <span class="upload-preview"></span>
+                </div>
+                <button class="followup-btn">發送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 成長駭客 Tab -->
+        <div id="detailTabGrowth" class="detail-tab-content">
+          <div class="ai-expert-panel">
+            <div class="expert-header">
+              <span class="expert-badge">📈 成長駭客優化專家</span>
+              <div class="expert-controls">
+                <div class="expert-context-input-wrapper" style="display: none;">
+                  <input type="text" class="expert-context-input" placeholder="🎯 自訂搜尋焦點 (選填)">
+                </div>
+                <button class="run-expert-btn" data-type="growth">▶️ 執行分析</button>
+              </div>
+            </div>
+            <div id="growthExpertResult" class="expert-result">
+              <p class="expert-hint">點擊「執行分析」開始 AI 專家深度分析</p>
+            </div>
+            <div class="followup-section" data-expert="growth" style="display: none;">
+              <div class="followup-input-wrapper">
+                <textarea class="followup-input" rows="3" placeholder="追問更多細節，例如：如何提高轉換率？"></textarea>
+                <div class="followup-upload-row">
+                  <label class="upload-label">
+                    📎 附加檔案
+                    <input type="file" class="followup-file" accept="image/*,.pdf" multiple>
+                  </label>
+                  <span class="upload-preview"></span>
+                </div>
+                <button class="followup-btn">發送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GA4 追蹤 Tab -->
+        <div id="detailTabGa4" class="detail-tab-content">
+          <div class="ai-expert-panel">
+            <div class="expert-header">
+              <span class="expert-badge">📊 GA4 追蹤專家</span>
+              <div class="expert-controls">
+                <div class="expert-context-input-wrapper" style="display: none;">
+                  <input type="text" class="expert-context-input" placeholder="🎯 自訂搜尋焦點 (選填)">
+                </div>
+                <button class="run-expert-btn" data-type="ga4">▶️ 執行分析</button>
+              </div>
+            </div>
+            <div id="ga4ExpertResult" class="expert-result">
+              <p class="expert-hint">點擊「執行分析」分析頁面可追蹤元素並獲得 GA4 事件設定建議</p>
+            </div>
+            <div class="followup-section" data-expert="ga4" style="display: none;">
+              <div class="followup-input-wrapper">
+                <textarea class="followup-input" rows="3" placeholder="追問更多細節，例如：如何追蹤購物車行為？"></textarea>
+                <div class="followup-upload-row">
+                  <label class="upload-label">
+                    📎 附加檔案
+                    <input type="file" class="followup-file" accept="image/*,.pdf" multiple>
+                  </label>
+                  <span class="upload-preview"></span>
+                </div>
+                <button class="followup-btn">發送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div> <!-- 關閉 detail-tab-contents -->
+
+  <!-- Secondary Views Toggle (Hidden on Initial Load) -->
+  <div class="secondary-section" id="secondarySection" style="display: none;">
+    <button class="toggle-btn" id="toggleSecondary">
+      ⬇️ 顯示 DOM Tree / JS Architecture
+    </button>
+
+    <div id="secondaryViews" class="secondary-views" hidden>
+      <div class="tabs">
+        <button class="tab active" data-tab="domTree">
+          <span class="tab-icon">🏗️</span> DOM Tree
+        </button>
+        <button class="tab" data-tab="jsArch">
+          <span class="tab-icon">⚙️</span> JS Architecture
+        </button>
+      </div>
+
+      <div class="tab-contents">
+        <div id="domTree" class="tab-content active">
+          <div class="panel-header">
+            <h2>DOM Tree 結構</h2>
+            <div id="domStats" class="stats"></div>
+          </div>
+          <div id="domTreeViz" class="tree-container"></div>
+        </div>
+
+        <div id="jsArch" class="tab-content">
+          <div class="panel-header">
+            <h2>JS Component Architecture</h2>
+            <div id="jsStats" class="stats"></div>
+          </div>
+          <div id="frameworkInfo" class="framework-info"></div>
+          <div id="jsArchViz" class="tree-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Report Section (Hidden on Initial Load) -->
+  <div class="site-report-section" id="siteReportSection" style="display: none;">
+    <div class="site-report-header">
+      <h2>📊 網站整體報告</h2>
+      <span class="pages-badge">已分析 <span id="analyzedPagesCount">0</span> 頁</span>
+    </div>
+    <p class="hint">💡 探勘多個頁面後，可生成跨頁面的綜合分析報告</p>
+
+    <!-- Site Report Tabs -->
+    <div class="site-report-tabs">
+      <button class="site-report-tab active" data-report-type="seo">
+        <span class="tab-icon">🔍</span> SEO 整站報告
+      </button>
+      <button class="site-report-tab" data-report-type="ux">
+        <span class="tab-icon">🎨</span> UX 整站報告
+      </button>
+      <button class="site-report-tab" data-report-type="growth">
+        <span class="tab-icon">📈</span> 成長整站報告
+      </button>
+      <button class="site-report-tab" data-report-type="ga4">
+        <span class="tab-icon">📊</span> GA4 追蹤整站報告
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Grounding Context Input (顯示於連網模式開啟時) -->
+
+
+  <!-- Site Report Tab Contents - Hidden on Initial Load -->
+  <div class="site-report-tab-contents" id="siteReportTabContents" style="display: none;">
+    <!-- SEO 整站報告 -->
+    <div id="siteReportTabSeo" class="site-report-tab-content active">
+      <div class="ai-expert-panel">
+        <div class="expert-header">
+          <span class="expert-badge">🔍 SEO 整站審計報告</span>
+          <div class="expert-controls">
+            <div class="expert-context-input-wrapper" style="display: none;">
+              <input type="text" class="expert-context-input" placeholder="🎯 自訂搜尋焦點 (選填)">
+            </div>
+            <button class="run-site-report-btn" data-type="seo">📊 生成報告</button>
+          </div>
+        </div>
+        <div id="siteReportSeoResult" class="expert-result">
+          <p class="expert-hint">點擊「生成報告」分析所有已探勘頁面的 SEO 狀況</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- UX 整站報告 -->
+    <div id="siteReportTabUx" class="site-report-tab-content">
+      <div class="ai-expert-panel">
+        <div class="expert-header">
+          <span class="expert-badge">🎨 UX 整站審計報告</span>
+          <div class="expert-controls">
+            <div class="expert-context-input-wrapper" style="display: none;">
+              <input type="text" class="expert-context-input" placeholder="🎯 自訂搜尋焦點 (選填)">
+            </div>
+            <button class="run-site-report-btn" data-type="ux">📊 生成報告</button>
+          </div>
+        </div>
+        <div id="siteReportUxResult" class="expert-result">
+          <p class="expert-hint">點擊「生成報告」分析所有已探勘頁面的 UX 一致性</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 成長整站報告 -->
+    <div id="siteReportTabGrowth" class="site-report-tab-content">
+      <div class="ai-expert-panel">
+        <div class="expert-header">
+          <span class="expert-badge">📈 成長整站審計報告</span>
+          <div class="expert-controls">
+            <div class="expert-context-input-wrapper" style="display: none;">
+              <input type="text" class="expert-context-input" placeholder="🎯 自訂搜尋焦點 (選填)">
+            </div>
+            <button class="run-site-report-btn" data-type="growth">📊 生成報告</button>
+          </div>
+        </div>
+        <div id="siteReportGrowthResult" class="expert-result">
+          <p class="expert-hint">點擊「生成報告」分析所有已探勘頁面的成長潛力</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- GA4 整站報告 -->
+    <div id="siteReportTabGa4" class="site-report-tab-content">
+      <div class="ai-expert-panel">
+        <div class="expert-header">
+          <span class="expert-badge">📊 GA4 整站追蹤報告</span>
+          <div class="expert-controls">
+            <div class="expert-context-input-wrapper" style="display: none;">
+              <input type="text" class="expert-context-input" placeholder="🎯 自訂搜尋焦點 (選填)">
+            </div>
+            <button class="run-site-report-btn" data-type="ga4">📊 生成報告</button>
+          </div>
+        </div>
+        <div id="siteReportGa4Result" class="expert-result">
+          <p class="expert-hint">點擊「生成報告」分析所有已探勘頁面的 GA4 追蹤治理架構</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Actions - Hidden on Initial Load -->
+  <div class="actions" id="actionsSection" style="display: none;">
+    <button id="downloadJson" class="btn-secondary">
+      📥 下載 JSON 原始數據
+    </button>
+    <span id="durationInfo" class="duration-info"></span>
+  </div>
+  </section>
+  </div>
+
+  <script src="app.js?v=20251221-11"></script>
+</body>
+
+</html>
