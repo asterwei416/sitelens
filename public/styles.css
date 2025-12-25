@@ -856,8 +856,35 @@ body {
   display: block !important;
   max-height: 600px;
   overflow-y: auto;
-  padding-right: 1.5rem;
-  /* 避免 scrollbar 蓋住文字 */
+  padding-right: 2rem;
+  /* 增加右側內邊距，讓捲動條與文字間距更大 */
+}
+
+/* 自定義專家分析區域的捲動條樣式 */
+.detail-tab-content.active:not(#detailTabInfo)::-webkit-scrollbar {
+  width: 8px;
+}
+
+.detail-tab-content.active:not(#detailTabInfo)::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  margin: 0.5rem 0;
+}
+
+.detail-tab-content.active:not(#detailTabInfo)::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.detail-tab-content.active:not(#detailTabInfo)::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
+}
+
+/* Firefox 捲動條樣式 */
+.detail-tab-content.active:not(#detailTabInfo) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.3) var(--bg-secondary);
 }
 
 /* 隱藏基本資訊 Tab 按鈕（因為永遠顯示在左側） */
