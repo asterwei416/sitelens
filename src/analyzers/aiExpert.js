@@ -114,6 +114,8 @@ const EXPERT_PROMPTS = {
 **你的輸出必須包含以下章節，並使用 Markdown 格式化（繁體中文）：**
 
 ### 1. 技術 SEO 執行摘要 (Executive Summary)
+首先，根據當前系統時間，現在是 {{Current_Time}}。我會優先搜尋與此時間最接近的最新資訊、趨勢或技術棧。
+
 -   **頁面類型識別**: [例如：電子商務商品頁 (PDP)]
 -   **頁面健康度評分**: (0-100分)
 -   **關鍵技術發現**: Top 3 影響該類型頁面目標（排名/轉化）的阻礙。
@@ -267,6 +269,8 @@ const EXPERT_PROMPTS = {
 **你的輸出必須包含以下章節，並使用 Markdown 格式化（繁體中文）：**
 
 ### 1. 體驗診斷摘要 (Experience Executive Summary)
+首先，根據當前系統時間，現在是 {{Current_Time}}。我會優先搜尋與此時間最接近的最新資訊、趨勢或技術棧。
+
 -   **介面類型識別**: [例如：SaaS 數據儀表板 (Utility UI)]
 -   **體驗健康度評分**: (0-100分)
 -   **核心用戶模擬**: [說明你模擬了哪種用戶視角，例如：視力老化的 iPad 使用者]
@@ -422,7 +426,7 @@ const EXPERT_PROMPTS = {
 **輸出必須使用 Markdown 格式，包含以下區塊：**
 
 ### 1. 增長戰略摘要 (Growth Strategy Executive Summary)
-**首先，確認當前系統時間為 {{Current_Time}}。**
+首先，根據當前系統時間，現在是 {{Current_Time}}。我會優先搜尋與此時間最接近的最新資訊、趨勢或技術棧。
 
 - **頁面漏斗定位**: Acquisition / Activation / Retention / Revenue / Referral
 - **增長健康度評分**: (0-100分)
@@ -536,6 +540,8 @@ const EXPERT_PROMPTS = {
 **請依照以下章節輸出 Markdown 文件，表格需乾淨可複製：**
 
 ### 一、Executive Summary (策略摘要)
+首先，根據當前系統時間，現在是 {{Current_Time}}。我會優先搜尋與此時間最接近的最新資訊、趨勢或技術棧。
+
 * **Business Objective**: 該頁面在行銷漏斗中的角色（Acquisition / Engagement / Monetization）。
 * **Measurement Strategy**: 核心追蹤邏輯摘要 (e.g., "採用混合式追蹤，基礎瀏覽用 GA4 Config，表單互動用 dataLayer push")。
 
@@ -716,6 +722,8 @@ const SITE_EXPERT_PROMPTS = {
 **輸出必須使用 Markdown 格式，包含以下章節：**
 
 ### 1. 全站 SEO 戰略執行摘要 (Executive Strategic Summary)
+首先，根據當前系統時間，現在是 {{Current_Time}}。我會優先搜尋與此時間最接近的最新資訊、趨勢或技術棧。
+
 * **網域健康度評分**: (0-100分，基於全站架構完整性)
 * **關鍵戰略發現 (Top 3 Systemic Issues)**: 影響全站的結構性問題。
 * **預期商業影響**: 修復後對整體流量或轉換的預估貢獻。
@@ -870,6 +878,8 @@ const SITE_EXPERT_PROMPTS = {
 **輸出必須使用 Markdown 格式，包含以下章節：**
 
 ### 1. 全站體驗執行摘要 (Executive UX Summary)
+首先，根據當前系統時間，現在是 {{Current_Time}}。我會優先搜尋與此時間最接近的最新資訊、趨勢或技術棧。
+
 * **體驗系統健康度評分**: (0-100分，基於一致性與可用性)
 * **關鍵系統性問題 (Top 3 Systemic Issues)**: 影響全站的架構性缺陷。
 * **預期商業影響**: 修復這些問題對 Retention (留存) 或 Conversion (轉化) 的預估效益。
@@ -1025,6 +1035,8 @@ const SITE_EXPERT_PROMPTS = {
 **輸出必須使用 Markdown 格式，包含以下章節：**
 
 ### 1. 全站增長戰略摘要 (Executive Growth Summary)
+首先，根據當前系統時間，現在是 {{Current_Time}}。我會優先搜尋與此時間最接近的最新資訊、趨勢或技術棧。
+
 * **增長健康度評分**: (0-100分，基於漏斗完整性與數據健康度)
 * **當前適用模型**: (判定為 AARRR 或 RARRA 階段及其理由)
 * **核心增長瓶頸 (The "Leaky Bucket")**: 全站流失最嚴重的環節。
@@ -1141,6 +1153,8 @@ const SITE_EXPERT_PROMPTS = {
 <output_schema>
 ## 5. Deliverable Structure (輸出結構)
 **請依照以下章節輸出 Markdown 文件：**
+
+首先，根據當前系統時間，現在是 {{Current_Time}}。我會優先搜尋與此時間最接近的最新資訊、趨勢或技術棧。
 
 ### 一、Global Configuration Strategy (全站配置策略)
 * **Data Stream & Cross-Domain**: 定義網域清單與跨網域追蹤設定。
