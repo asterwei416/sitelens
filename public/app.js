@@ -888,11 +888,16 @@ function setupAiExpertButtons() {
     });
   });
 
-  // 執行分析按鈕
+  // 執行分析按鈕 - 使用 cloneNode 清除舊監聽器避免累積
   document.querySelectorAll('.run-expert-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const expertType = btn.dataset.type;
-      await runAiExpertAnalysis(expertType, btn);
+    // 複製按鈕以清除所有舊的事件監聽器
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+
+    // 在新按鈕上綁定事件
+    newBtn.addEventListener('click', async () => {
+      const expertType = newBtn.dataset.type;
+      await runAiExpertAnalysis(expertType, newBtn);
     });
   });
 
@@ -1036,6 +1041,9 @@ function parseMarkdown(text) {
   // 預處理：移除 AI 可能包裹的 ```markdown 區塊
   text = text.replace(/^```markdown\s*\n/i, '').replace(/\n```\s*$/i, '');
   text = text.replace(/^```\s*\n/, '').replace(/\n```\s*$/, '');
+
+  // 移除 Google Grounding 引用標記 (例如：[cite: 0.2] 或 [cite：0.2])
+  text = text.replace(/\[cite[：:]\s*[\d.]+\]/gi, '');
 
   // 使用 marked.js
   if (typeof marked !== 'undefined') {
@@ -1322,16 +1330,24 @@ function updateSiteReportButton() {
 // 設定整體報告按鈕事件
 function setupSiteReportButtons() {
   document.querySelectorAll('.site-report-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const type = tab.dataset.reportType;
+    // 清除舊監聽器
+    const newTab = tab.cloneNode(true);
+    tab.parentNode.replaceChild(newTab, tab);
+
+    newTab.addEventListener('click', () => {
+      const type = newTab.dataset.reportType;
       switchSiteReportTab(type);
     });
   });
 
   document.querySelectorAll('.run-site-report-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const type = btn.dataset.type;
-      await generateSiteReport(type, btn);
+    // 清除舊監聽器
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+
+    newBtn.addEventListener('click', async () => {
+      const type = newBtn.dataset.type;
+      await generateSiteReport(type, newBtn);
     });
   });
 }

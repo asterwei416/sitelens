@@ -422,6 +422,8 @@ const EXPERT_PROMPTS = {
 **輸出必須使用 Markdown 格式，包含以下區塊：**
 
 ### 1. 增長戰略摘要 (Growth Strategy Executive Summary)
+**首先，確認當前系統時間為 {{Current_Time}}。**
+
 - **頁面漏斗定位**: Acquisition / Activation / Retention / Revenue / Referral
 - **增長健康度評分**: (0-100分)
 - **核心診斷**: 一句話描述該頁面最大的增長瓶頸
