@@ -12,6 +12,27 @@ const { analyzeGA4TrackingElements } = require('./src/analyzers/gaTrackingAnalyz
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// CORS 支援 - 允許 localhost 與 127.0.0.1 互通
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    `http://localhost:${PORT}`,
+    `http://127.0.0.1:${PORT}`
+  ];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -511,7 +532,8 @@ app.post('/api/ai-site-report', async (req, res) => {
     // 替換佔位符並建立 System Prompt
     let systemPrompt = expertConfig.prompt
       .replace('{{GROUNDING_INSTRUCTION}}', groundingInstruction)
-      .replace('{{TOTAL_PAGES}}', totalPages);
+      .replace('{{TOTAL_PAGES}}', totalPages)
+      .replace('{{Current_Time}}', new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', hour12: false }));
 
     // 使用 systemInstruction 載入完整專家人格
     const model = genAI.getGenerativeModel({

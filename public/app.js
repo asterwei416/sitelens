@@ -403,11 +403,17 @@ function renderTreeNode(node, depth = 0) {
   if (node.loading) drillHint = '<span class="drill-hint">分析中...</span>';
   else if (!node.analyzed && node.type !== 'root' && node.type !== 'group') drillHint = '<span class="drill-hint">點擊探勘</span>';
 
+  // 處理 URL 顯示文字
+  const displayUrl = node.url ? new URL(node.url).pathname + new URL(node.url).search : '';
+
   nodeEl.innerHTML = `
     <div class="tree-node-content ${node.analyzed ? 'analyzed' : ''} ${node.loading ? 'loading' : ''} ${node.type === 'group' ? 'group-node' : ''}" data-url="${node.url || ''}">
       <span class="expand-icon">${expandIcon}</span>
       <span class="node-icon ${node.loading ? 'loading-icon' : ''}">${icon}</span>
-      <span class="node-title">${node.title}</span>
+      <div class="node-text-wrapper">
+        <span class="node-title">${node.title}</span>
+        ${node.url ? `<span class="node-url-display">${displayUrl}</span>` : ''}
+      </div>
       ${urlLink}
       ${badge}
       ${drillHint}
@@ -1038,6 +1044,12 @@ function parseMarkdown(text) {
         breaks: true,
         gfm: true
       });
+
+      // 預處理：修復冒號後接 * 符號的列表格式問題
+      // 將 "：* 內容" 或 ": * 內容" 轉換為正確的列表換行格式
+      text = text.replace(/：\s*\*\s+/g, '：\n  * ');
+      text = text.replace(/:\s*\*\s+/g, ':\n  * ');
+
       return marked.parse(text);
     } catch (e) {
       console.error('marked.js 解析錯誤:', e);
@@ -1380,8 +1392,8 @@ async function generateSiteReport(expertType, btn) {
       title: p.title,
       seoTags: p.pageDetail?.seoTags || {},
       headingsCount: p.pageDetail?.headings?.length || 0,
-      internalLinks: p.pageDetail?.flow?.internal?.length || 0,
-      externalLinks: p.pageDetail?.flow?.external?.length || 0,
+      internalLinks: p.pageDetail?.flow?.internalLinks || 0,
+      externalLinks: p.pageDetail?.flow?.externalLinks || 0,
       domElements: p.domTree?.stats?.totalElements || 0,
       frameworks: p.jsArchitecture?.frameworks?.map(f => f.name) || []
     }));
