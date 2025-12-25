@@ -48,6 +48,40 @@ body {
 }
 
 /* ========================================
+   Global Scrollbar Styles (紫色現代風格)
+======================================== */
+/* Webkit 瀏覽器 (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 4px;
+  border: 2px solid var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--accent-secondary), var(--accent-primary));
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--bg-secondary);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-primary) var(--bg-secondary);
+}
+
+/* ========================================
    App Container
 ======================================== */
 .app {
@@ -1768,6 +1802,8 @@ body {
   overflow-y: auto;
   line-height: 1.7;
   font-size: 0.9rem;
+  padding-right: 1rem;
+  /* 增加右側內邊距，讓內容與 scrollbar 保持間距 */
 }
 
 .expert-hint {
