@@ -9,7 +9,7 @@ COPY package*.json ./
 
 # Install production dependencies only
 # Skip postinstall to avoid redundant browser installation (already in base image)
-RUN npm ci --only=production --ignore-scripts
+RUN npm ci --omit=dev --ignore-scripts
 
 # Copy source code
 COPY . .
