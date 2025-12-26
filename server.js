@@ -134,6 +134,11 @@ app.post('/api/ai-site-overview', async (req, res) => {
 - 首頁連結數: ${siteData.linksCount}
 - 主要導覽項目: ${siteData.navItems?.join('、') || '未知'}
 - 語意區塊: ${siteData.blocks?.map(b => b.type).join('、') || '未知'}
+${siteData.goals && siteData.goals.length > 0 ? `
+## 🎯 使用者指定的網站目標
+**重要**：使用者已明確指出此網站的核心目標為：「${siteData.goals.join('、')}」
+請在分析時特別關注這些目標，並評估網站目前的設計與內容是否有效支持這些目標。
+` : ''}
 </input_data>
 
 <output_schema>

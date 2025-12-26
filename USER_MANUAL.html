@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteLens AI 使用者操作手冊</title>
+    <style>
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #252540;
+            --accent: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .version {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav h2 {
+            font-size: 1rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .nav-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            list-style: none;
+        }
+
+        .nav-list a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 6px;
+            display: block;
+            transition: all 0.2s;
+        }
+
+        .nav-list a:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent);
+        }
+
+        /* Sections */
+        section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin: 1.5rem 0 1rem;
+        }
+
+        h4 {
+            font-size: 1rem;
+            color: var(--accent-secondary);
+            margin: 1rem 0 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        /* Code */
+        code {
+            background: var(--bg-secondary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-secondary);
+        }
+
+        pre {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Lists */
+        ul,
+        ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Expert Cards */
+        .expert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .expert-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .expert-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .expert-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .expert-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .expert-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Steps */
+        .steps {
+            counter-reset: step;
+        }
+
+        .step {
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Tips */
+        .tip {
+            background: rgba(99, 102, 241, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .tip::before {
+            content: '💡';
+            margin-right: 0.5rem;
+        }
+
+        .warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .warning::before {
+            content: '⚠️';
+            margin-right: 0.5rem;
+        }
+
+        /* FAQ */
+        .faq-item {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .faq-q {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-a {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+        }
+
+        .footer-logo {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            section {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">🔍</div>
+            <h1>SiteLens AI</h1>
+            <p class="tagline">用 AI 的眼看穿網站，將數據鍛造成洞察報告</p>
+            <p class="version">版本 1.0 | 更新日期：2025-12-25</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <h2>📋 目錄</h2>
+            <ul class="nav-list">
+                <li><a href="#intro">🎯 系統簡介</a></li>
+                <li><a href="#quickstart">🚀 快速開始</a></li>
+                <li><a href="#basic">📖 基本操作</a></li>
+                <li><a href="#experts">🤖 AI 專家分析</a></li>
+                <li><a href="#site-report">📊 整站報告</a></li>
+                <li><a href="#advanced">⚙️ 進階功能</a></li>
+                <li><a href="#faq">❓ 常見問題</a></li>
+            </ul>
+        </nav>
+
+        <!-- 系統簡介 -->
+        <section id="intro">
+            <h2>🎯 系統簡介</h2>
+            <p><strong>SiteLens AI (網站之眼)</strong> 是一款結合 AI 技術的網站分析工具，能夠深度解析網站結構、SEO 狀況、使用者體驗及成長潛力。</p>
+
+            <h3>核心功能</h3>
+            <table>
+                <tr>
+                    <th>功能</th>
+                    <th>說明</th>
+                </tr>
+                <tr>
+                    <td>🗺️ Sitemap 結構分析</td>
+                    <td>自動探測網站架構，以視覺化樹狀圖呈現</td>
+                </tr>
+                <tr>
+                    <td>📄 頁面深度分析</td>
+                    <td>取得 SEO Tags、連結動線、語意區塊</td>
+                </tr>
+                <tr>
+                    <td>🤖 AI 專家報告</td>
+                    <td>四位 AI 專家提供專業分析建議</td>
+                </tr>
+                <tr>
+                    <td>📊 整站報告</td>
+                    <td>跨頁面的綜合分析與戰略建議</td>
+                </tr>
+                <tr>
+                    <td>🔍 Google 連網分析</td>
+                    <td>即時搜尋最新資訊輔助分析</td>
+                </tr>
+            </table>
+
+            <h3>四大 AI 專家</h3>
+            <div class="expert-grid">
+                <div class="expert-card">
+                    <div class="expert-icon">🔍</div>
+                    <div class="expert-name">SEO 技術專家</div>
+                    <div class="expert-desc">技術 SEO、Core Web Vitals、結構化資料</div>
+                </div>
+                <div class="expert-card">
+                    <div class="expert-icon">🎨</div>
+                    <div class="expert-name">UX 設計專家</div>
+                    <div class="expert-desc">使用者體驗、介面設計、行為心理學</div>
+                </div>
+                <div class="expert-card">
+                    <div class="expert-icon">📈</div>
+                    <div class="expert-name">成長優化專家</div>
+                    <div class="expert-desc">轉換率優化、增長策略、行為科學</div>
+                </div>
+                <div class="expert-card">
+                    <div class="expert-icon">📊</div>
+                    <div class="expert-name">GA4 追蹤專家</div>
+                    <div class="expert-desc">Google Analytics 4 追蹤設定建議</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快速開始 -->
+        <section id="quickstart">
+            <h2>🚀 快速開始</h2>
+            <div class="steps">
+                <div class="step">
+                    <h4>啟動伺服器</h4>
+                    <pre><code>cd 網頁分析系統
+npm start</code></pre>
+                    <p>伺服器啟動後會顯示：<code>🚀 運行於 http://localhost:3000</code></p>
+                </div>
+                <div class="step">
+                    <h4>開啟瀏覽器</h4>
+                    <p>在瀏覽器中輸入 <code>http://localhost:3000</code></p>
+                </div>
+                <div class="step">
+                    <h4>輸入分析資訊</h4>
+                    <ul>
+                        <li><strong>目標 URL</strong>：輸入要分析的網站網址</li>
+                        <li><strong>Gemini API Key</strong>：輸入您的 API Key</li>
+                        <li>點擊 <strong>「開始分析」</strong></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tip">API Key 可從 <a href="https://aistudio.google.com/" target="_blank"
+                    style="color: var(--accent);">Google AI Studio</a> 免費取得</div>
+        </section>
+
+        <!-- 基本操作 -->
+        <section id="basic">
+            <h2>📖 基本操作</h2>
+
+            <h3>🌐 輸入目標 URL</h3>
+            <p>在輸入框中輸入完整的網站網址，例如：</p>
+            <ul>
+                <li><code>https://www.example.com</code></li>
+                <li><code>https://shop.example.com/products</code></li>
+            </ul>
+            <div class="warning">網址必須包含 <code>https://</code> 或 <code>http://</code> 前綴</div>
+
+            <h3>🗺️ 瀏覽 Sitemap 結構</h3>
+            <p>分析完成後，左側面板會顯示網站的樹狀結構：</p>
+            <ul>
+                <li><strong>🏠 根節點</strong>：代表首頁</li>
+                <li><strong>📄 子節點</strong>：代表子頁面</li>
+                <li><strong>點擊節點</strong>：可查看該頁面的詳細資訊</li>
+                <li><strong>縮放控制</strong>：使用 ➕ ➖ 按鈕或滑鼠滾輪調整視圖</li>
+            </ul>
+
+            <h3>📋 查看基本資訊</h3>
+            <table>
+                <tr>
+                    <th>區塊</th>
+                    <th>內容</th>
+                </tr>
+                <tr>
+                    <td>SEO Tags</td>
+                    <td>Title、Description、Canonical URL 等</td>
+                </tr>
+                <tr>
+                    <td>標題結構</td>
+                    <td>H1 ~ H6 標題層級</td>
+                </tr>
+                <tr>
+                    <td>連結動線</td>
+                    <td>頁面內的內部/外部連結</td>
+                </tr>
+                <tr>
+                    <td>語意區塊</td>
+                    <td>Header、Main、Footer 等區域偵測</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- AI 專家分析 -->
+        <section id="experts">
+            <h2>🤖 AI 專家分析</h2>
+
+            <h3>執行單頁分析</h3>
+            <ol>
+                <li>點擊 Sitemap 中的任意頁面節點</li>
+                <li>選擇想要的專家分頁 (SEO / UX / Growth / GA4)</li>
+                <li>點擊 <strong>「▶️ 執行分析」</strong> 按鈕</li>
+                <li>等待 AI 生成分析報告</li>
+            </ol>
+
+            <h3>專家分析重點</h3>
+
+            <h4>🔍 SEO 技術專家</h4>
+            <ul>
+                <li>頁面類型識別 (電商頁、文章頁、列表頁等)</li>
+                <li>頁面健康度評分 (0-100 分)</li>
+                <li>關鍵技術發現 (Top 3)</li>
+                <li>渲染模式診斷 (SSR/CSR/SSG)</li>
+                <li>結構化資料 (Schema.org) 檢核</li>
+            </ul>
+
+            <h4>🎨 UX 設計專家</h4>
+            <ul>
+                <li>介面類型識別 (轉換型/工具型/內容型)</li>
+                <li>體驗健康度評分 (0-100 分)</li>
+                <li>關鍵阻礙點 (Top Friction Points)</li>
+                <li>行為設計模型 (B=MAP) 分析</li>
+                <li>無障礙性 (A11y) 檢核</li>
+            </ul>
+
+            <h4>📈 成長優化專家</h4>
+            <ul>
+                <li>頁面漏斗定位 (AARRR)</li>
+                <li>增長健康度評分 (0-100 分)</li>
+                <li>核心增長瓶頸診斷</li>
+                <li>行為心理學分析 (Fogg Model)</li>
+                <li>A/B 測試建議</li>
+            </ul>
+
+            <h4>📊 GA4 追蹤專家</h4>
+            <ul>
+                <li>商業目標識別</li>
+                <li>GA4 事件規格表</li>
+                <li>dataLayer 實作規範</li>
+                <li>GTM 設定指引</li>
+            </ul>
+
+            <h3>🔍 Google 連網分析 (Grounding)</h3>
+            <p>開啟此功能後，AI 專家會即時搜尋 Google 取得最新資訊：</p>
+            <ol>
+                <li>啟用頂部的 <strong>「🔍 啟用 Google 連網分析」</strong> 開關</li>
+                <li>執行專家分析時，AI 會自動搜尋相關資訊</li>
+                <li>報告中會包含 <strong>「🔍 外部情報」</strong> 區塊</li>
+            </ol>
+        </section>
+
+        <!-- 整站報告 -->
+        <section id="site-report">
+            <h2>📊 整站報告</h2>
+            <p>當您探勘多個頁面後，可生成跨頁面的綜合分析報告。</p>
+
+            <h3>操作步驟</h3>
+            <ol>
+                <li>先點擊多個 Sitemap 節點 (至少 2-3 個頁面)</li>
+                <li>捲動到頁面下方的 <strong>「📊 網站整體報告」</strong> 區塊</li>
+                <li>選擇專家類型</li>
+                <li>點擊 <strong>「📊 生成報告」</strong></li>
+            </ol>
+
+            <h3>整站專家</h3>
+            <table>
+                <tr>
+                    <th>專家</th>
+                    <th>分析視角</th>
+                </tr>
+                <tr>
+                    <td>🔍 SEO 戰略總監</td>
+                    <td>資訊架構、內容生態、主題叢集、關鍵字蠶食</td>
+                </tr>
+                <tr>
+                    <td>🎨 UX 架構總監</td>
+                    <td>設計系統一致性、導航邏輯、跨頁面流程</td>
+                </tr>
+                <tr>
+                    <td>📈 成長戰略總監</td>
+                    <td>完整漏斗分析、成長迴圈、數據基礎設施</td>
+                </tr>
+                <tr>
+                    <td>📊 GA4 數據總監</td>
+                    <td>全站追蹤藍圖、事件模組化、User Properties</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- 進階功能 -->
+        <section id="advanced">
+            <h2>⚙️ 進階功能</h2>
+
+            <h3>🍪 登入 Cookie 設定</h3>
+            <p>若需分析需要登入的頁面 (如會員專區)：</p>
+            <ol>
+                <li>展開 <strong>「🍪 進階設定」</strong></li>
+                <li>使用 EditThisCookie 擴充功能從瀏覽器匯出 Cookie</li>
+                <li>將 JSON 格式的 Cookie 貼入文字框</li>
+                <li>開始分析</li>
+            </ol>
+
+            <h3>📥 下載原始數據</h3>
+            <p>分析完成後，可點擊 <strong>「📥 下載 JSON 原始數據」</strong> 匯出完整分析結果。</p>
+
+            <h3>🏗️ DOM Tree / JS Architecture</h3>
+            <p>點擊 <strong>「⬇️ 顯示 DOM Tree / JS Architecture」</strong> 可查看：</p>
+            <ul>
+                <li><strong>DOM Tree 結構</strong>：頁面的 HTML 元素層級</li>
+                <li><strong>JS Architecture</strong>：偵測使用的前端框架</li>
+            </ul>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq">
+            <h2>❓ 常見問題</h2>
+
+            <div class="faq-item">
+                <div class="faq-q">Q1: 分析時出現「Failed to fetch」錯誤？</div>
+                <div class="faq-a">
+                    <strong>解決方法：</strong>確認 API Key 正確無誤、嘗試分析其他網站、檢查網路連線狀態。
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Q2: 為什麼某些頁面無法分析？</div>
+                <div class="faq-a">
+                    <strong>可能原因：</strong>頁面需要登入驗證、網站使用 JavaScript 動態載入、網站設有防爬蟲機制。可嘗試使用 Cookie 功能登入。
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Q3: API Key 從哪裡取得？</div>
+                <div class="faq-a">
+                    前往 <a href="https://aistudio.google.com/" target="_blank" style="color: var(--accent);">Google AI
+                        Studio</a> → 登入 Google 帳號 → 點擊「Get API Key」。
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q">Q4: 分析報告可以匯出嗎？</div>
+                <div class="faq-a">
+                    可點擊報告右上方的「📋 複製報告」按鈕複製 Markdown 格式，或使用「📥 下載 JSON 原始數據」匯出完整數據。
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-logo">🪐</div>
+            <p><strong>Google Anti-Gravity Project</strong></p>
+            <p>"Gravity is optional; Performance, Scalability, and Evolution are mandatory."</p>
+        </footer>
+    </div>
+</body>
+
+</html>

@@ -92,7 +92,7 @@ body {
 /* 保持 Header 和 Input Section 置中且有寬度限制 */
 .header,
 .input-section {
-  max-width: 1000px;
+  max-width: 700px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
@@ -161,7 +161,7 @@ body {
 }
 
 .url-form {
-  max-width: 1000px;
+  max-width: 700px;
   margin: 0 auto;
 }
 
@@ -389,6 +389,107 @@ body {
   background: white;
 }
 
+/* ========================================
+   Website Goals Selection
+======================================== */
+.goals-section {
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.goals-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.goals-icon {
+  font-size: 1.1rem;
+}
+
+.goals-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.goals-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.goals-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.goal-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.85rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 2rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.goal-tag:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.goal-tag.selected {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.goal-tag.selected:hover {
+  opacity: 0.9;
+}
+
+.goal-tag .tag-icon {
+  font-size: 0.9rem;
+}
+
+.custom-goal-wrapper {
+  margin-top: 0.5rem;
+}
+
+.custom-goal-input {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.custom-goal-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.custom-goal-input::placeholder {
+  color: var(--text-muted);
+}
+
 .grounding-context-row {
   margin-top: 0.75rem;
 }
@@ -485,6 +586,67 @@ body {
 }
 
 #urlInput::placeholder {
+  color: var(--text-muted);
+}
+
+/* URL 歷史記錄清除按鈕 */
+.clear-history-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.35rem 0.5rem;
+  opacity: 0.5;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.clear-history-btn:hover {
+  opacity: 1;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.url-input-wrapper {
+  position: relative;
+}
+
+/* Submit Section (底部提交區塊) */
+.submit-section {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.submit-btn-large {
+  width: 100%;
+  max-width: 400px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border: none;
+  border-radius: var(--border-radius);
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding: 1rem 2.5rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.submit-btn-large:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px var(--accent-glow);
+}
+
+.submit-btn-large:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.submit-hint {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 

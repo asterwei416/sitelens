@@ -23,11 +23,266 @@ const durationInfo = document.getElementById('durationInfo');
 const toggleSecondaryBtn = document.getElementById('toggleSecondary');
 const secondaryViews = document.getElementById('secondaryViews');
 
-// ========================================
 // Event Listeners
 // ========================================
 analyzeForm.addEventListener('submit', handleSubmit);
 downloadJsonBtn.addEventListener('click', downloadJson);
+
+// ========================================
+// URL History Management
+// ========================================
+const URL_HISTORY_KEY = 'sitelens_url_history';
+const MAX_URL_HISTORY = 20; // 最多保存 20 筆記錄
+
+function loadUrlHistory() {
+  try {
+    const history = localStorage.getItem(URL_HISTORY_KEY);
+    return history ? JSON.parse(history) : [];
+  } catch (e) {
+    console.error('讀取 URL 歷史記錄失敗:', e);
+    return [];
+  }
+}
+
+function saveUrlToHistory(url) {
+  try {
+    let history = loadUrlHistory();
+    // 移除重複的 URL (如果存在)
+    history = history.filter(item => item !== url);
+    // 新 URL 加到最前面
+    history.unshift(url);
+    // 保持最大數量限制
+    if (history.length > MAX_URL_HISTORY) {
+      history = history.slice(0, MAX_URL_HISTORY);
+    }
+    localStorage.setItem(URL_HISTORY_KEY, JSON.stringify(history));
+    renderUrlHistoryDatalist();
+  } catch (e) {
+    console.error('儲存 URL 歷史記錄失敗:', e);
+  }
+}
+
+function clearUrlHistory() {
+  try {
+    localStorage.removeItem(URL_HISTORY_KEY);
+    renderUrlHistoryDatalist();
+  } catch (e) {
+    console.error('清除 URL 歷史記錄失敗:', e);
+  }
+}
+
+function renderUrlHistoryDatalist() {
+  const datalist = document.getElementById('urlHistoryList');
+  const clearBtn = document.getElementById('clearUrlHistory');
+
+  if (!datalist) return;
+
+  const history = loadUrlHistory();
+  datalist.innerHTML = history.map(url => `<option value="${url}">`).join('');
+
+  // 顯示/隱藏清除按鈕
+  if (clearBtn) {
+    clearBtn.style.display = history.length > 0 ? 'block' : 'none';
+  }
+}
+
+// 初始化 URL 歷史記錄
+renderUrlHistoryDatalist();
+
+// 清除歷史記錄按鈕事件
+const clearUrlHistoryBtn = document.getElementById('clearUrlHistory');
+if (clearUrlHistoryBtn) {
+  clearUrlHistoryBtn.addEventListener('click', () => {
+    if (confirm('確定要清除所有 URL 歷史記錄嗎？')) {
+      clearUrlHistory();
+    }
+  });
+}
+
+// ========================================
+// API Key Management (自動儲存)
+// ========================================
+const API_KEY_STORAGE_KEY = 'sitelens_gemini_api_key';
+const geminiApiKeyInput = document.getElementById('geminiApiKey');
+
+function loadApiKey() {
+  try {
+    const savedKey = localStorage.getItem(API_KEY_STORAGE_KEY);
+    if (savedKey && geminiApiKeyInput) {
+      geminiApiKeyInput.value = savedKey;
+      // 顯示清除按鈕
+      const clearBtn = document.getElementById('clearApiKey');
+      if (clearBtn) clearBtn.style.display = 'block';
+    }
+  } catch (e) {
+    console.error('讀取 API Key 失敗:', e);
+  }
+}
+
+function saveApiKey(key) {
+  try {
+    if (key && key.trim()) {
+      localStorage.setItem(API_KEY_STORAGE_KEY, key.trim());
+    }
+  } catch (e) {
+    console.error('儲存 API Key 失敗:', e);
+  }
+}
+
+function clearSavedApiKey() {
+  try {
+    localStorage.removeItem(API_KEY_STORAGE_KEY);
+  } catch (e) {
+    console.error('清除 API Key 失敗:', e);
+  }
+}
+
+// 初始化載入已儲存的 API Key
+loadApiKey();
+
+// API Key 輸入時自動儲存
+if (geminiApiKeyInput) {
+  geminiApiKeyInput.addEventListener('blur', () => {
+    saveApiKey(geminiApiKeyInput.value);
+  });
+
+  // 當輸入變化時，顯示/隱藏清除按鈕
+  geminiApiKeyInput.addEventListener('input', () => {
+    const clearBtn = document.getElementById('clearApiKey');
+    if (clearBtn) {
+      clearBtn.style.display = geminiApiKeyInput.value ? 'block' : 'none';
+    }
+  });
+}
+
+// 清除 API Key 按鈕事件
+const clearApiKeyBtn = document.getElementById('clearApiKey');
+if (clearApiKeyBtn) {
+  clearApiKeyBtn.addEventListener('click', () => {
+    if (geminiApiKeyInput) {
+      geminiApiKeyInput.value = '';
+      clearSavedApiKey();
+      clearApiKeyBtn.style.display = 'none';
+    }
+  });
+}
+
+// ========================================
+// Website Goals Management (網站目標選擇)
+// ========================================
+const GOALS_STORAGE_KEY = 'sitelens_website_goals';
+const CUSTOM_GOAL_STORAGE_KEY = 'sitelens_custom_goal';
+let selectedGoals = new Set();
+
+// 目標對應的中文名稱
+const GOAL_LABELS = {
+  'lead-generation': '蒐集名單',
+  'brand-awareness': '品牌知名度',
+  'ecommerce': '電商銷售',
+  'traffic-conversion': '導流轉換',
+  'content-marketing': '內容行銷',
+  'customer-service': '客戶服務'
+};
+
+function loadSavedGoals() {
+  try {
+    // 載入預設目標
+    const savedGoals = localStorage.getItem(GOALS_STORAGE_KEY);
+    if (savedGoals) {
+      selectedGoals = new Set(JSON.parse(savedGoals));
+    }
+
+    // 載入自訂目標
+    const customGoal = localStorage.getItem(CUSTOM_GOAL_STORAGE_KEY);
+    const customGoalInput = document.getElementById('customGoal');
+    if (customGoal && customGoalInput) {
+      customGoalInput.value = customGoal;
+    }
+
+    // 更新 UI
+    renderGoalsSelection();
+  } catch (e) {
+    console.error('讀取網站目標失敗:', e);
+  }
+}
+
+function saveGoals() {
+  try {
+    localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify([...selectedGoals]));
+
+    const customGoalInput = document.getElementById('customGoal');
+    if (customGoalInput && customGoalInput.value.trim()) {
+      localStorage.setItem(CUSTOM_GOAL_STORAGE_KEY, customGoalInput.value.trim());
+    } else {
+      localStorage.removeItem(CUSTOM_GOAL_STORAGE_KEY);
+    }
+  } catch (e) {
+    console.error('儲存網站目標失敗:', e);
+  }
+}
+
+function renderGoalsSelection() {
+  document.querySelectorAll('.goal-tag').forEach(tag => {
+    const goal = tag.dataset.goal;
+    if (selectedGoals.has(goal)) {
+      tag.classList.add('selected');
+    } else {
+      tag.classList.remove('selected');
+    }
+  });
+}
+
+function getSelectedGoals() {
+  const goals = [];
+
+  // 取得預設選項
+  selectedGoals.forEach(goalKey => {
+    if (GOAL_LABELS[goalKey]) {
+      goals.push(GOAL_LABELS[goalKey]);
+    }
+  });
+
+  // 取得自訂目標
+  const customGoalInput = document.getElementById('customGoal');
+  if (customGoalInput && customGoalInput.value.trim()) {
+    goals.push(customGoalInput.value.trim());
+  }
+
+  return goals;
+}
+
+function getSelectedGoalsText() {
+  const goals = getSelectedGoals();
+  return goals.length > 0 ? goals.join('、') : '未指定';
+}
+
+// 初始化目標選擇
+loadSavedGoals();
+
+// 標籤點擊事件
+document.querySelectorAll('.goal-tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    const goal = tag.dataset.goal;
+
+    if (selectedGoals.has(goal)) {
+      selectedGoals.delete(goal);
+      tag.classList.remove('selected');
+    } else {
+      selectedGoals.add(goal);
+      tag.classList.add('selected');
+    }
+
+    saveGoals();
+  });
+});
+
+// 自訂目標輸入事件
+const customGoalInput = document.getElementById('customGoal');
+if (customGoalInput) {
+  customGoalInput.addEventListener('blur', () => {
+    saveGoals();
+  });
+}
 
 toggleSecondaryBtn.addEventListener('click', () => {
   secondaryViews.hidden = !secondaryViews.hidden;
@@ -78,6 +333,9 @@ async function handleSubmit(e) {
 
   const url = urlInput.value.trim();
   if (!url) return;
+
+  // 儲存 URL 到歷史記錄
+  saveUrlToHistory(url);
 
   // 讀取 Session Cookies (如果有填寫)
   let cookies = null;
@@ -1609,14 +1867,22 @@ async function fetchSiteOverview(data) {
       description: data.level0PageDetail?.seoTags?.description || '',
       linksCount: data.level0PageDetail?.flow?.internal?.length || 0,
       navItems: data.level0PageDetail?.flow?.nav?.map(n => n.text) || [],
-      blocks: data.level0PageDetail?.blocks || []
+      blocks: data.level0PageDetail?.blocks || [],
+      goals: getSelectedGoals() // 新增：使用者指定的網站目標
     };
 
-    const response = await fetch('/api/ai-site-overview', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ siteData, apiKey })
-    });
+    let response;
+    try {
+      response = await fetch('/api/ai-site-overview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ siteData, apiKey })
+      });
+    } catch (networkError) {
+      // 網路層面的錯誤（無法連接伺服器）
+      console.error('網站概覽網路錯誤:', networkError);
+      throw new Error('無法連接伺服器，請確認伺服器正在運行中');
+    }
 
     const result = await response.json();
 

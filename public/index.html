@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SiteLens AI (網站之眼)</title>
   <meta name="description" content="分析網頁的 Sitemap、SEO Tags、連結動線與語意區塊">
-  <link rel="stylesheet" href="styles.css?v=20251225-2116">
+  <link rel="stylesheet" href="styles.css?v=20251226-1527">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
@@ -30,27 +30,56 @@
           <div class="form-row">
             <div class="input-wrapper url-input-wrapper" style="width: 100%;">
               <span class="input-icon">🌐</span>
-              <input type="url" id="urlInput" placeholder="輸入目標 URL (例: https://example.com)" required>
+              <input type="url" id="urlInput" placeholder="輸入目標 URL (例: https://example.com)" required
+                list="urlHistoryList" autocomplete="off">
+              <datalist id="urlHistoryList"></datalist>
+              <button type="button" id="clearUrlHistory" class="clear-history-btn" title="清除歷史記錄"
+                style="display: none;">🗑️</button>
             </div>
           </div>
 
-          <!-- Row 2: API Key + Submit -->
+          <!-- Row 2: API Key -->
           <div class="form-row">
-            <div class="input-wrapper api-key-wrapper">
+            <div class="input-wrapper api-key-wrapper" style="width: 100%;">
               <span class="input-icon">🔑</span>
-              <input type="password" id="geminiApiKey" placeholder="Gemini API Key" />
+              <input type="password" id="geminiApiKey" placeholder="Gemini API Key（啟用 AI 深度分析）" />
               <button id="toggleKeyVisibility" type="button" title="顯示/隱藏">👁️</button>
               <button id="clearApiKey" type="button" title="清除內容" style="display: none;">❌</button>
             </div>
-            <button type="submit" id="submitBtn">
-              <span class="btn-text">開始分析</span>
-              <span class="btn-loading" hidden>
-                <span class="spinner"></span> 分析中...
-              </span>
-            </button>
           </div>
         </div>
-        <p class="api-hint">💡 提供 API Key 可啟用 AI 網站概覽分析（架構解讀 + 商業目標判斷）</p>
+
+        <!-- Website Goals Selection -->
+        <div class="goals-section">
+          <div class="goals-header">
+            <span class="goals-icon">🎯</span>
+            <span class="goals-title">網站目標</span>
+            <span class="goals-hint">(可多選，讓 AI 分析更精準)</span>
+          </div>
+          <div class="goals-tags" id="goalsTags">
+            <button type="button" class="goal-tag" data-goal="lead-generation">
+              <span class="tag-icon">🧲</span> 蒐集名單
+            </button>
+            <button type="button" class="goal-tag" data-goal="brand-awareness">
+              <span class="tag-icon">🌟</span> 品牌知名度
+            </button>
+            <button type="button" class="goal-tag" data-goal="ecommerce">
+              <span class="tag-icon">🛒</span> 電商銷售
+            </button>
+            <button type="button" class="goal-tag" data-goal="traffic-conversion">
+              <span class="tag-icon">🔀</span> 導流轉換
+            </button>
+            <button type="button" class="goal-tag" data-goal="content-marketing">
+              <span class="tag-icon">📚</span> 內容行銷
+            </button>
+            <button type="button" class="goal-tag" data-goal="customer-service">
+              <span class="tag-icon">🤝</span> 客戶服務
+            </button>
+          </div>
+          <div class="custom-goal-wrapper">
+            <input type="text" id="customGoal" class="custom-goal-input" placeholder="📝 自訂目標（選填）">
+          </div>
+        </div>
 
         <!-- Global Grounding Toggle -->
         <div class="grounding-row">
@@ -75,6 +104,17 @@
               placeholder='[{"name": "session_id", "value": "abc123", "domain": ".example.com", "path": "/"}]'></textarea>
           </div>
         </details>
+
+        <!-- Submit Button (移到最下方) -->
+        <div class="submit-section">
+          <button type="submit" id="submitBtn" class="submit-btn-large">
+            <span class="btn-text">🚀 開始分析</span>
+            <span class="btn-loading" hidden>
+              <span class="spinner"></span> 分析中...
+            </span>
+          </button>
+          <p class="submit-hint">完成以上設定後，點擊開始 AI 深度分析</p>
+        </div>
       </form>
       <div id="statusMessage" class="status-message"></div>
     </section>
@@ -445,7 +485,7 @@
   </section>
   </div>
 
-  <script src="app.js?v=20251221-11"></script>
+  <script src="app.js?v=20251226-1518"></script>
 </body>
 
 </html>
