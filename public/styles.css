@@ -1,34 +1,50 @@
 /* ========================================
-   CSS Variables & Reset
+   CSS Variables & Reset - Art Deco Edition
 ======================================== */
 :root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-tertiary: #1a1a25;
-  --bg-card: #1e1e2a;
-  --bg-hover: #252535;
+  /* Art Deco Palette */
+  --bg-primary: #0D0D0D;
+  --bg-secondary: #1A1A1A;
+  --bg-tertiary: #252525;
+  --bg-card: #1E1E1E;
+  --bg-hover: #2A2A2A;
 
-  --accent-primary: #6366f1;
-  --accent-secondary: #8b5cf6;
-  --accent-glow: rgba(99, 102, 241, 0.3);
+  /* Gold Accents */
+  --gold-primary: #D4AF37;
+  --gold-secondary: #C9A962;
+  --gold-tertiary: #B8860B;
+  --gold-glow: rgba(212, 175, 55, 0.25);
+  --gold-border: rgba(212, 175, 55, 0.4);
 
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  /* Legacy accent mapping (for compatibility) */
+  --accent-primary: var(--gold-primary);
+  --accent-secondary: var(--gold-secondary);
+  --accent-glow: var(--gold-glow);
 
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --info: #3b82f6;
+  /* Text Colors */
+  --text-primary: #F5F5F0;
+  --text-secondary: #B8B8B0;
+  --text-muted: #7A7A70;
 
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-radius: 12px;
-  --border-radius-sm: 8px;
+  /* Status Colors */
+  --success: #4CAF50;
+  --warning: #D4AF37;
+  --error: #C0392B;
+  --info: #5DADE2;
 
-  --font-mono: 'Consolas', 'Monaco', monospace;
+  /* Borders */
+  --border-color: rgba(212, 175, 55, 0.15);
+  --border-radius: 4px;
+  --border-radius-sm: 2px;
 
+  /* Art Deco Fonts */
+  --font-display: 'Poiret One', cursive;
+  --font-body: 'Raleway', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+
+  /* Transitions */
   --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s ease;
+  --transition-normal: 0.3s ease;
 }
 
 *,
@@ -40,11 +56,13 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
   background: var(--bg-primary);
   color: var(--text-primary);
-  line-height: 1.6;
+  line-height: 1.7;
   min-height: 100vh;
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 /* ========================================
@@ -106,70 +124,121 @@ body {
 }
 
 /* ========================================
-   Header
+   Header - Art Deco Style
 ======================================== */
 .header {
   text-align: center;
-  margin-bottom: 2rem;
-  padding-top: 3rem;
+  margin-bottom: 3rem;
+  padding: 4rem 2rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Art Deco Sunburst Background */
+.header::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 800px;
+  height: 800px;
+  transform: translate(-50%, -50%);
+  background: repeating-conic-gradient(from 0deg,
+      transparent 0deg 8deg,
+      rgba(212, 175, 55, 0.03) 8deg 10deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Gold decorative line */
+.header::after {
+  content: '◆────────────────◆';
+  display: block;
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--gold-primary);
+  letter-spacing: 0.3em;
+  opacity: 0.6;
 }
 
 .logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
 }
 
 .logo-icon {
-  font-size: 2.25rem;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.1);
-  }
+  font-size: 2.5rem;
+  filter: drop-shadow(0 0 10px var(--gold-glow));
 }
 
 .logo h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-primary);
+  text-shadow: 0 0 30px var(--gold-glow);
 }
 
 .tagline {
+  font-family: var(--font-body);
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  position: relative;
+  z-index: 1;
 }
 
 /* ========================================
-   Input Section
+   Input Section - Art Deco Style
 ======================================== */
 .input-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .url-form {
   max-width: 700px;
   margin: 0 auto;
+  padding: 2rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--gold-border);
+  position: relative;
+}
+
+/* Art Deco corner decorations */
+.url-form::before,
+.url-form::after {
+  content: '◇';
+  position: absolute;
+  color: var(--gold-primary);
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.url-form::before {
+  top: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.url-form::after {
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* Layout Containers */
 .form-container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .form-row {
@@ -182,11 +251,15 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: var(--bg-secondary);
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 0.75rem 1.125rem;
-  transition: border-color var(--transition-fast);
+  padding: 0.85rem 1.25rem;
+  transition: all var(--transition-normal);
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 15px var(--gold-glow), inset 0 0 10px rgba(212, 175, 55, 0.05);
 }
 
 .url-input-wrapper {
@@ -196,7 +269,6 @@ body {
 .api-key-wrapper {
   flex: 1;
   min-width: 0;
-  /* Prevent flex overflow */
 }
 
 #geminiApiKey {
@@ -205,18 +277,19 @@ body {
   background: transparent;
   border: none;
   color: var(--text-primary);
+  font-family: var(--font-body);
   font-size: 0.95rem;
   padding: 0.5rem 0.25rem;
   padding-right: 40px;
-  /* 為右側按鈕預留空間 */
   outline: none;
+  letter-spacing: 0.02em;
 }
 
 #geminiApiKey::placeholder {
   color: var(--text-muted);
 }
 
-/* API Key 輸入框內的按鈕 */
+/* API Key buttons */
 .api-key-wrapper button {
   flex-shrink: 0;
   background: transparent;
@@ -224,17 +297,19 @@ body {
   font-size: 0.95rem;
   cursor: pointer;
   padding: 0.25rem;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
+  opacity: 0.6;
+  transition: all 0.2s ease;
 }
 
 .api-key-wrapper button:hover {
   opacity: 1;
+  filter: drop-shadow(0 0 5px var(--gold-glow));
 }
 
 .input-icon {
-  font-size: 1rem;
+  font-size: 1.1rem;
   opacity: 0.7;
+  color: var(--gold-secondary);
 }
 
 .api-hint {
@@ -390,75 +465,94 @@ body {
 }
 
 /* ========================================
-   Website Goals Selection
+   Website Goals Selection - Art Deco Style
 ======================================== */
 .goals-section {
-  margin-top: 1.25rem;
-  padding: 1rem 1.25rem;
-  background: var(--bg-secondary);
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  position: relative;
+}
+
+/* Chevron decoration */
+.goals-section::before {
+  content: '▽';
+  position: absolute;
+  top: -0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--gold-primary);
+  font-size: 0.7rem;
+  opacity: 0.5;
 }
 
 .goals-header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .goals-icon {
   font-size: 1.1rem;
+  color: var(--gold-secondary);
 }
 
 .goals-title {
-  font-weight: 600;
-  color: var(--text-primary);
-  font-size: 0.95rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--gold-primary);
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .goals-hint {
   font-size: 0.8rem;
   color: var(--text-muted);
+  font-weight: 300;
 }
 
 .goals-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
 }
 
 .goal-tag {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.5rem 0.85rem;
-  background: var(--bg-tertiary);
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 2rem;
   color: var(--text-secondary);
+  font-family: var(--font-body);
   font-size: 0.85rem;
+  font-weight: 400;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   user-select: none;
+  letter-spacing: 0.03em;
 }
 
 .goal-tag:hover {
   background: var(--bg-hover);
-  border-color: var(--accent-primary);
+  border-color: var(--gold-secondary);
   color: var(--text-primary);
 }
 
 .goal-tag.selected {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  border-color: transparent;
-  color: white;
-  box-shadow: 0 2px 8px var(--accent-glow);
+  background: var(--gold-primary);
+  border-color: var(--gold-primary);
+  color: var(--bg-primary);
+  box-shadow: 0 0 15px var(--gold-glow);
 }
 
 .goal-tag.selected:hover {
-  opacity: 0.9;
+  background: var(--gold-secondary);
 }
 
 .goal-tag .tag-icon {
@@ -611,64 +705,98 @@ body {
   position: relative;
 }
 
-/* Submit Section (底部提交區塊) */
+/* Submit Section - Art Deco Style */
 .submit-section {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   text-align: center;
+  position: relative;
+}
+
+/* Decorative chevrons */
+.submit-section::before {
+  content: '❮❮';
+  position: absolute;
+  left: calc(50% - 220px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold-primary);
+  opacity: 0.3;
+  font-size: 1.2rem;
+  letter-spacing: -0.3em;
+}
+
+.submit-section::after {
+  content: '❯❯';
+  position: absolute;
+  right: calc(50% - 220px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold-primary);
+  opacity: 0.3;
+  font-size: 1.2rem;
+  letter-spacing: -0.3em;
 }
 
 .submit-btn-large {
   width: 100%;
-  max-width: 400px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  border: none;
-  border-radius: var(--border-radius);
-  color: white;
-  font-size: 1.15rem;
-  font-weight: 700;
-  padding: 1rem 2.5rem;
+  max-width: 350px;
+  background: var(--gold-primary);
+  border: 2px solid var(--gold-secondary);
+  color: var(--bg-primary);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 1.1rem 2.5rem;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 15px var(--accent-glow);
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px var(--gold-glow);
+  position: relative;
 }
 
 .submit-btn-large:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px var(--accent-glow);
+  background: var(--gold-secondary);
+  box-shadow: 0 0 30px var(--gold-glow), 0 5px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
 }
 
 .submit-btn-large:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
 .submit-hint {
-  margin-top: 0.75rem;
+  margin-top: 1rem;
   font-size: 0.85rem;
   color: var(--text-muted);
+  font-weight: 300;
+  letter-spacing: 0.05em;
 }
 
 #submitBtn {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  border: none;
-  border-radius: var(--border-radius-sm);
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 0.75rem 2rem;
+  background: var(--gold-primary);
+  border: 2px solid var(--gold-secondary);
+  color: var(--bg-primary);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.85rem 2rem;
   cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: all 0.3s ease;
 }
 
 #submitBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px var(--accent-glow);
+  background: var(--gold-secondary);
+  box-shadow: 0 0 20px var(--gold-glow);
 }
 
 #submitBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
@@ -678,7 +806,7 @@ body {
   width: 16px;
   height: 16px;
   border: 2px solid transparent;
-  border-top-color: white;
+  border-top-color: var(--bg-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
