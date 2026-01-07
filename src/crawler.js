@@ -1,5 +1,12 @@
 const { chromium } = require('playwright');
 
+// 截圖設定
+const SCREENSHOT_CONFIG = {
+    maxHeight: 5000,  // 最大截圖高度 (px)，防止無限捲動頁面過長
+    quality: 70,      // JPEG 品質
+    type: 'jpeg'
+};
+
 // 隨機 User-Agent 池
 const USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -13,6 +20,39 @@ const getRandomUserAgent = () => USER_AGENTS[Math.floor(Math.random() * USER_AGE
 // 隨機延遲
 const randomDelay = (min = 100, max = 500) =>
     new Promise(resolve => setTimeout(resolve, Math.random() * (max - min) + min));
+
+/**
+ * 截取頁面快照（帶高度限制，防止無限捲動頁面過長）
+ * @param {Page} page - Playwright page 物件
+ * @returns {Promise<Buffer>} 截圖 Buffer
+ */
+async function capturePageScreenshot(page) {
+    // 取得頁面實際高度
+    const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+    const viewportWidth = await page.evaluate(() => window.innerWidth);
+
+    // 若頁面高度超過限制，使用 clip 截取上半部分
+    if (pageHeight > SCREENSHOT_CONFIG.maxHeight) {
+        console.log(`[Screenshot] 頁面高度 ${pageHeight}px 超過限制，截取前 ${SCREENSHOT_CONFIG.maxHeight}px`);
+        return await page.screenshot({
+            type: SCREENSHOT_CONFIG.type,
+            quality: SCREENSHOT_CONFIG.quality,
+            clip: {
+                x: 0,
+                y: 0,
+                width: viewportWidth,
+                height: SCREENSHOT_CONFIG.maxHeight
+            }
+        });
+    }
+
+    // 正常全頁截圖
+    return await page.screenshot({
+        type: SCREENSHOT_CONFIG.type,
+        quality: SCREENSHOT_CONFIG.quality,
+        fullPage: true
+    });
+}
 
 /**
  * 爬取 Level 0 與 Level 1 頁面
@@ -66,12 +106,8 @@ async function crawlPage(url, cookies = null) {
 
         const level0Data = await extractPageData(page, url);
 
-        // Level 0 截圖 (供視覺多模態 AI 分析)
-        const screenshotBuffer = await page.screenshot({
-            type: 'jpeg',
-            quality: 70,
-            fullPage: false
-        });
+        // Level 0 截圖 (供視覺多模態 AI 分析) - 帶高度限制
+        const screenshotBuffer = await capturePageScreenshot(page);
         level0Data.screenshot = screenshotBuffer.toString('base64');
 
         // 取得同網域連結
@@ -257,12 +293,8 @@ async function crawlSinglePage(url, cookies = null) {
             return hints;
         });
 
-        // 截取頁面快照 (base64)
-        const screenshotBuffer = await page.screenshot({
-            type: 'jpeg',
-            quality: 70,
-            fullPage: false // 僅視窗範圍，避免過大
-        });
+        // 截取頁面快照 (base64) - 帶高度限制
+        const screenshotBuffer = await capturePageScreenshot(page);
         const screenshot = screenshotBuffer.toString('base64');
 
         // 取得頁面中的所有連結
