@@ -2,8 +2,8 @@ const { chromium } = require('playwright');
 
 // 截圖設定
 const SCREENSHOT_CONFIG = {
-    maxHeight: 5000,  // 最大截圖高度 (px)，防止無限捲動頁面過長
-    quality: 70,      // JPEG 品質
+    maxHeight: 16384,  // 提高截圖高度限制 (Playwright 最大支援約 16384px)
+    quality: 70,       // JPEG 品質
     type: 'jpeg'
 };
 
@@ -22,31 +22,80 @@ const randomDelay = (min = 100, max = 500) =>
     new Promise(resolve => setTimeout(resolve, Math.random() * (max - min) + min));
 
 /**
+ * 自動捲動至頁面底部，觸發所有 Lazy Loading 內容
+ * 包含安全機制防止無限捲動頁面造成無限迴圈
+ * @param {Page} page - Playwright page 物件
+ */
+async function scrollToBottom(page) {
+    const MAX_SCROLL_ITERATIONS = 30;  // 最大捲動次數
+    const MAX_SCROLL_HEIGHT = SCREENSHOT_CONFIG.maxHeight + 1000; // 最大捲動高度（略高於截圖限制）
+
+    await page.evaluate(async ({ maxIterations, maxHeight }) => {
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        const scrollStep = window.innerHeight * 0.8; // 每次捲動 80% 視窗高度
+        let lastScrollTop = -1;
+        let currentScrollTop = 0;
+        let iterations = 0;
+
+        // 持續捲動直到：無法再捲動 / 達到次數上限 / 超過高度限制
+        while (lastScrollTop !== currentScrollTop && iterations < maxIterations) {
+            lastScrollTop = currentScrollTop;
+            window.scrollBy(0, scrollStep);
+            await delay(150); // 等待 Lazy Loading 觸發
+            currentScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            iterations++;
+
+            // 超過最大高度則提前停止
+            if (currentScrollTop > maxHeight) {
+                break;
+            }
+        }
+
+        // 捲動回頂部（確保截圖從頂部開始）
+        window.scrollTo(0, 0);
+        await delay(500);  // 增加等待時間確保動畫完成
+    }, { maxIterations: MAX_SCROLL_ITERATIONS, maxHeight: MAX_SCROLL_HEIGHT });
+
+    console.log('[Crawler] 已完成頁面捲動，觸發 Lazy Loading');
+}
+
+/**
  * 截取頁面快照（帶高度限制，防止無限捲動頁面過長）
  * @param {Page} page - Playwright page 物件
  * @returns {Promise<Buffer>} 截圖 Buffer
  */
 async function capturePageScreenshot(page) {
-    // 取得頁面實際高度
-    const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
-    const viewportWidth = await page.evaluate(() => window.innerWidth);
+    // 先捲動至底部觸發 Lazy Loading，再捲回頂部
+    await scrollToBottom(page);
 
-    // 若頁面高度超過限制，使用 clip 截取上半部分
-    if (pageHeight > SCREENSHOT_CONFIG.maxHeight) {
-        console.log(`[Screenshot] 頁面高度 ${pageHeight}px 超過限制，截取前 ${SCREENSHOT_CONFIG.maxHeight}px`);
-        return await page.screenshot({
-            type: SCREENSHOT_CONFIG.type,
-            quality: SCREENSHOT_CONFIG.quality,
-            clip: {
-                x: 0,
-                y: 0,
-                width: viewportWidth,
-                height: SCREENSHOT_CONFIG.maxHeight
+    // 注入 CSS 停用所有動畫（防止 React/CSS 動畫導致元素不可見）
+    await page.addStyleTag({
+        content: `
+            *, *::before, *::after {
+                animation: none !important;
+                animation-duration: 0s !important;
+                animation-delay: 0s !important;
+                transition: none !important;
+                transition-duration: 0s !important;
+                transition-delay: 0s !important;
             }
-        });
+        `
+    });
+
+    // 確保所有動畫完成渲染後再截圖
+    await page.waitForTimeout(500);
+
+    // 取得頁面實際高度（供記錄用）
+    const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+
+    // 記錄頁面高度（若超過限制只是警告，仍使用 fullPage 截圖）
+    if (pageHeight > SCREENSHOT_CONFIG.maxHeight) {
+        console.log(`[Screenshot] 頁面高度 ${pageHeight}px 超過建議限制 ${SCREENSHOT_CONFIG.maxHeight}px，可能影響效能`);
+    } else {
+        console.log(`[Screenshot] 頁面高度 ${pageHeight}px，執行全頁截圖`);
     }
 
-    // 正常全頁截圖
+    // 始終使用 fullPage 截圖（確保捕捉完整內容）
     return await page.screenshot({
         type: SCREENSHOT_CONFIG.type,
         quality: SCREENSHOT_CONFIG.quality,
