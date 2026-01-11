@@ -153,36 +153,88 @@ async function crawlPage(url, cookies = null) {
         await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
         await randomDelay();
 
-        const level0Data = await extractPageData(page, url);
-
         // Level 0 截圖 (供視覺多模態 AI 分析) - 帶高度限制
+        // 注意：capturePageScreenshot 內部會執行捲動以觸發 Lazy Loading
         const screenshotBuffer = await capturePageScreenshot(page);
+
+        // 截圖後再提取資料，確保 Lazy Loading 內容已被載入
+        const level0Data = await extractPageData(page, url);
         level0Data.screenshot = screenshotBuffer.toString('base64');
 
-        // 取得同網域連結
+        // 取得同網域連結 (允許同 Root Domain 的子網域)
         const baseUrl = new URL(url);
-        const internalLinks = await page.evaluate((origin) => {
+        const internalLinks = await page.evaluate((baseUrlStr) => {
+            const currentUrl = new URL(baseUrlStr);
+
+            // 輔助函式：取得 Root Domain (例如: esim.djbcard.com -> djbcard.com)
+            const getRootDomain = (hostname) => {
+                const parts = hostname.split('.');
+                if (parts.length <= 2) return hostname;
+                // 簡單處理常見的 .com.tw, .co.jp 等情況或直接取後兩段
+                // 這裡採用簡單策略：取最後兩段 (針對 djbcard.com 這種 case)
+                return parts.slice(-2).join('.');
+            };
+
+            const rootDomain = getRootDomain(currentUrl.hostname);
+
             const links = Array.from(document.querySelectorAll('a[href]'));
             return links
                 .map(a => {
                     try {
                         const href = a.getAttribute('href');
                         if (!href || href.startsWith('#') || href.startsWith('javascript:')) return null;
+
                         const fullUrl = new URL(href, window.location.origin);
-                        if (fullUrl.origin === origin) {
+
+                        // 檢查是否為主網域相同
+                        const linkRootDomain = getRootDomain(fullUrl.hostname);
+
+                        // 允許爬取條件：
+                        // 1. 完全同源 (Origin 相同)
+                        // 2. 或者是同一個 Root Domain (例如 sub.example.com -> example.com)
+                        if (fullUrl.origin === currentUrl.origin || linkRootDomain === rootDomain) {
                             return { url: fullUrl.href, text: a.textContent?.trim() || '' };
                         }
                     } catch { }
                     return null;
                 })
                 .filter(Boolean);
-        }, baseUrl.origin);
+        }, url);
 
         // 去重
         const uniqueLinks = [...new Map(internalLinks.map(l => [l.url, l])).values()];
 
-        // Level 1: 並行抓取前 10 個連結 (效能限制)
-        const linksToFetch = uniqueLinks.slice(0, 10);
+        // 智慧排序：優先保留重要頁面 (Blog, About, Contact)，避免被大量商品頁淹沒
+        uniqueLinks.sort((a, b) => {
+            const getScore = (link) => {
+                let score = 0;
+                const urlLower = link.url.toLowerCase();
+                const textLower = link.text ? link.text.toLowerCase() : '';
+
+                // 1. 高價值關鍵字 (結構性頁面)
+                const highValueKeywords = ['blog', 'news', 'about', 'contact', 'faq', 'support', 'pricing', 'features', 'service', 'teach'];
+                if (highValueKeywords.some(k => urlLower.includes(k) || textLower.includes(k))) {
+                    score += 10;
+                }
+
+                // 2. 避免商品頁/雜項頁霸榜 (降低權重)
+                const lowValueKeywords = ['product', 'item', 'category', 'cart', 'login', 'register', 'signin', 'signup', 'account'];
+                if (lowValueKeywords.some(k => urlLower.includes(k))) {
+                    score -= 5;
+                }
+
+                // 3. URL 長度權重 (越短通常層級越高，作為次要排序依據)
+                // 減少長度對分數的影響，避免蓋過關鍵字權重
+                score -= urlLower.length * 0.05;
+
+                return score;
+            };
+
+            return getScore(b) - getScore(a); // 降序排列 (分數高的排前面)
+        });
+
+        // Level 1: 並行抓取前 20 個連結 (效能限制)
+        const linksToFetch = uniqueLinks.slice(0, 20);
         console.log(`[Level 1] 抓取 ${linksToFetch.length} 個頁面...`);
 
         const level1Data = await Promise.all(

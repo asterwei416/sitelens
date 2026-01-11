@@ -2389,9 +2389,16 @@ body {
   color: white;
   font-size: 0.85rem;
   font-weight: 600;
-  padding: 0.6rem 1rem;
+  padding: 0 1rem;
+  /* 改用 height */
+  height: 42px;
+  /* 強制設定高度 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
 .followup-btn:hover {
@@ -2422,30 +2429,42 @@ body {
   border-left-color: var(--accent-secondary);
 }
 
-/* Followup Upload Row */
+/* Followup Upload Row - 重置為純容器 */
 .followup-upload-row {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  background: var(--bg-tertiary);
-  border-radius: var(--border-radius-sm);
-  border: 1px dashed var(--border-color);
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
 }
 
 .upload-label {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
   cursor: pointer;
   font-size: 0.85rem;
+  font-weight: 600;
   color: var(--accent-primary);
-  transition: color var(--transition-fast);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 0 1rem;
+  /* 使用 flex 置中，改用 height 控制高度 */
+  height: 42px;
+  /* 強制設定高度 */
+  box-sizing: border-box;
+  /* 確保高度包含 border */
+  transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
 .upload-label:hover {
   color: var(--accent-secondary);
+  border-color: var(--accent-primary);
 }
 
 .upload-label input[type="file"] {

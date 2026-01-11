@@ -662,7 +662,19 @@ function renderTreeNode(node, depth = 0) {
   else if (!node.analyzed && node.type !== 'root' && node.type !== 'group') drillHint = '<span class="drill-hint">點擊探勘</span>';
 
   // 處理 URL 顯示文字
-  const displayUrl = node.url ? new URL(node.url).pathname + new URL(node.url).search : '';
+  let displayUrl = '';
+  if (node.url) {
+    try {
+      // 一律顯示完整網址 (移除 Protocol 以節省空間，或者保留)
+      // 使用者要求完整顯示，這裡顯示 hostname + path + search
+      const urlObj = new URL(node.url);
+      displayUrl = urlObj.hostname + urlObj.pathname + urlObj.search;
+      // 若想連 https:// 都顯示，就直接用 node.url
+      // 但通常 hostname 開頭比較好讀
+    } catch (e) {
+      displayUrl = node.url;
+    }
+  }
 
   nodeEl.innerHTML = `
     <div class="tree-node-content ${node.analyzed ? 'analyzed' : ''} ${node.loading ? 'loading' : ''} ${node.type === 'group' ? 'group-node' : ''}" data-url="${node.url || ''}">
@@ -1300,8 +1312,8 @@ function parseMarkdown(text) {
   text = text.replace(/^```markdown\s*\n/i, '').replace(/\n```\s*$/i, '');
   text = text.replace(/^```\s*\n/, '').replace(/\n```\s*$/, '');
 
-  // 移除 Google Grounding 引用標記 (例如：[cite: 0.2] 或 [cite：0.2])
-  text = text.replace(/\[cite[：:]\s*[\d.]+\]/gi, '');
+  // 移除 Google Grounding 引用標記 (例如：[cite: 0.2] 或 [cite: -] 或 [cite：0.2])
+  text = text.replace(/\[cite[：:]\s*[\d.\-]+\]/gi, '');
 
   // 使用 marked.js
   if (typeof marked !== 'undefined') {
@@ -1345,7 +1357,6 @@ function renderExpertResult(resultEl, data) {
 
   resultEl.innerHTML = `
     <div class="analysis-header">
-      <span class="expert-badge">${data.icon} ${data.expert}</span>
       <div class="analysis-actions">
         <button class="copy-report-btn" title="複製報告 Markdown">📋 複製報告</button>
         <span class="duration">耗時 ${data.duration}</span>
